@@ -9,6 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write  # 
     
     steps:
     - uses: actions/checkout@v4
@@ -16,9 +19,15 @@ jobs:
     - name: Build the Docker image
       run: |
         docker build --file Dockerfile --tag checkpoint-alert:latest .
-        docker save checkpoint-alert:latest -o image.tar
+        docker tag checkpoint-alert:latest ghcr.io/${{ github.repository_owner }}/checkpoint-alert:latest
     
-    - name: Upload artifact (optional)
+    - name: Login to GitHub Container Registry
+      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    
+    - name: Push to GitHub Packages
+      run: docker push ghcr.io/${{ github.repository_owner }}/checkpoint-alert:latest
+    
+    - name: Upload artifact (optional - если хотите и артефакт тоже)
       uses: actions/upload-artifact@v4
       with:
         name: docker-image
