@@ -1,0 +1,14 @@
+services:
+  vpn-monitor-bot:
+    build: .
+    container_name: vpn-monitor-bot
+    restart: unless-stopped
+    network_mode: "host"
+    env_file:
+      - .env
+    volumes:
+      - ./.env:/app/.env
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
